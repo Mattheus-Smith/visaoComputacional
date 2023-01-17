@@ -1,4 +1,7 @@
 #baixe a versão 3.7.9 do python
+
+#====================== versão windows ======================
+
 #instale a biblioteca virtualenv  -> pip install virtualenv 
 
 #execute os seguintes comando
@@ -11,3 +14,6 @@ source venvY3/Scripts/activate
 	
 #	vai ser gerado o resultado na pasta -> C:\..\yolov3\runs\detect\exp
 
+./venvY3/Scripts/python.exe detect.py --source data/videos/video.mp4
+
+#	vai ser gerado o resultado na pasta -> C:\..\yolov3\runs\detect\exp2
