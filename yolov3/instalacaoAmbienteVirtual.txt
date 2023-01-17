@@ -1,0 +1,13 @@
+#baixe a versão 3.7.9 do python
+#instale a biblioteca virtualenv  -> pip install virtualenv 
+
+#execute os seguintes comando
+virtualenv venvY3
+source venvY3/Scripts/activate
+./venvY3/Scripts/pip install -r requirements.txt
+
+#testa se esta funcionando
+./venvY3/Scripts/python.exe detect.py --source data/images/zidane.jpg
+	
+#	vai ser gerado o resultado na pasta -> C:\..\yolov3\runs\detect\exp
+
