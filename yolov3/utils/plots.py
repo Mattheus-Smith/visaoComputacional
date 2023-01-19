@@ -82,7 +82,7 @@ class Annotator:
             self.im = im
         self.lw = line_width or max(round(sum(im.shape) / 2 * 0.003), 2)  # line width
 
-    def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255)):
+    def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255), operador=0):
         # Add one xyxy box to image with label
         if self.pil or not is_ascii(label):
             self.draw.rectangle(box, width=self.lw, outline=color)  # box
@@ -95,7 +95,33 @@ class Annotator:
                                      box[1] + 1 if outside else box[1] + h + 1], fill=color)
                 # self.draw.text((box[0], box[1]), label, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
                 self.draw.text((box[0], box[1] - h if outside else box[1]), label, fill=txt_color, font=self.font)
-        else:  # cv2
+
+        elif operador == 1: #marcar o centro
+            print("operador 1")
+            p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
+            x1 = int(p1[0])
+            y1 = int(p1[1])
+            x2 = int(p2[0])
+            y2 = int(p2[1])
+            thickness = 2
+            radius = 2
+
+            xcx = x1 + int((x2 - x1) / 2)
+            xcy = y1 + int((y2 - y1) / 2)
+
+            cv2.circle(self.im, (xcx, xcy), radius, color, thickness, lineType=8, shift=0)
+
+            if label:
+                print("operador 1 - label")
+                tf = max(self.lw - 1, 1)  # font thickness
+                w, h = cv2.getTextSize(label, 0, fontScale=self.lw / 3, thickness=tf)[0]  # text width, height
+                outside = p1[1] - h - 3 >= 0  # label fits outside box
+                p2 = p1[0] + w, p1[1] - h - 3 if outside else p1[1] + h + 3
+                cv2.rectangle(self.im, p1, p2, color, -1, cv2.LINE_AA)  # filled
+                cv2.putText(self.im, label, (p1[0], p1[1] - 2 if outside else p1[1] + h + 2), 0, self.lw / 3, txt_color,
+                            thickness=tf, lineType=cv2.LINE_AA)
+
+        else:  # cv2 - default
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
             cv2.rectangle(self.im, p1, p2, color, thickness=self.lw, lineType=cv2.LINE_AA)
             if label:
@@ -236,7 +262,7 @@ def plot_images(images, targets, paths=None, fname='images.jpg', names=None, max
                 cls = names[cls] if names else cls
                 if labels or conf[j] > 0.25:  # 0.25 conf thresh
                     label = f'{cls}' if labels else f'{cls} {conf[j]:.1f}'
-                    annotator.box_label(box, label, color=color)
+                    annotator.box_label(box, label, color=color, operador=1)
     annotator.im.save(fname)  # save
 
 

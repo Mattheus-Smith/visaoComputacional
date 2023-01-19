@@ -516,7 +516,7 @@ class Detections:
                             crops.append({'box': box, 'conf': conf, 'cls': cls, 'label': label,
                                           'im': save_one_box(box, im, file=file, save=save)})
                         else:  # all others
-                            annotator.box_label(box, label, color=colors(cls))
+                            annotator.box_label(box, label, color=colors(cls), operador=1)
                     im = annotator.im
             else:
                 s += '(no detections)'
