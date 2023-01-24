@@ -154,7 +154,7 @@ class ClearmlLogger:
 
                     if conf > conf_threshold:
                         annotator.rectangle(box.cpu().numpy(), outline=color)
-                        annotator.box_label(box.cpu().numpy(), label=label, color=color)
+                        annotator.box_label(box.cpu().numpy(), label=label, color=color, operador=1)
 
                 annotated_image = annotator.result()
                 self.task.get_logger().report_image(title='Bounding Boxes',
