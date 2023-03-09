@@ -55,7 +55,8 @@ from GetFrame import getFrame
 @smart_inference_mode()
 def run(
         weights=ROOT / 'yolov5s.pt',  # model path or triton URL
-        source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
+        source1=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
+        source2=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
@@ -84,14 +85,23 @@ def run(
         label_img = ROOT,
         operador = ROOT
 ):
-    source = str(source)
-    save_img = not nosave and not source.endswith('.txt')  # save inference images
-    is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
-    is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
-    webcam = source.isnumeric() or source.endswith('.streams') or (is_url and not is_file)
-    screenshot = source.lower().startswith('screen')
-    if is_url and is_file:
-        source = check_file(source)  # download
+    source1 = str(source1)
+    save_img1 = not nosave and not source1.endswith('.txt')  # save inference images
+    is_file1 = Path(source1).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
+    is_url1 = source1.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
+    webcam1 = source1.isnumeric() or source1.endswith('.streams') or (is_url1 and not is_file1)
+    screenshot1 = source1.lower().startswith('screen')
+    if is_url1 and is_file1:
+        source1 = check_file(source1)  # download
+
+    source2 = str(source2)
+    save_img2 = not nosave and not source2.endswith('.txt')  # save inference images
+    is_file2 = Path(source2).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
+    is_url2 = source2.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
+    webcam2 = source2.isnumeric() or source2.endswith('.streams') or (is_url2 and not is_file2)
+    screenshot2 = source2.lower().startswith('screen')
+    if is_url2 and is_file2:
+        source2 = check_file(source2)  # download
 
     # Directories
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
@@ -105,33 +115,53 @@ def run(
 
     # Dataloader
     bs = 1  # batch_size
-    if webcam:
+    if webcam1:
         view_img = check_imshow(warn=True)
-        dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
-        bs = len(dataset)
-    elif screenshot:
-        dataset = LoadScreenshots(source, img_size=imgsz, stride=stride, auto=pt)
+        dataset1 = LoadStreams(source1, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+        bs = len(dataset1)
+    elif screenshot1:
+        dataset1 = LoadScreenshots(source1, img_size=imgsz, stride=stride, auto=pt)
     else:
-        dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
-    vid_path, vid_writer = [None] * bs, [None] * bs
+        dataset1 = LoadImages(source1, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+    vid_path1, vid_writer1 = [None] * bs, [None] * bs
+
+    if webcam2:
+        view_img = check_imshow(warn=True)
+        dataset2 = LoadStreams(source2, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+        bs = len(dataset2)
+    elif screenshot2:
+        dataset2 = LoadScreenshots(source2, img_size=imgsz, stride=stride, auto=pt)
+    else:
+        dataset2 = LoadImages(source2, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+    vid_path2, vid_writer2 = [None] * bs, [None] * bs
 
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
     seen, windows, dt = 0, [], (Profile(), Profile(), Profile())
 
-    for path, im, im0s, vid_cap, s in dataset:
+    #for path1, im1, im0s1, vid_cap1, s1 in dataset2:
 
-        #cv2.imwrite("imgIM0S.png", im0s)
+    # Itera sobre as duas instâncias juntas
+    for data1, data2 in zip(dataset1, dataset2):
 
-        seen, dt = getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres,
-                            iou_thres, classes, agnostic_nms, max_det, seen, webcam,dataset, save_crop, Annotator, line_thickness, names, scale_boxes,
-                            save_txt, xyxy2xywh, save_conf, save_img, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path, vid_writer,
+        # processa os dados de cada instância
+        path1, im1, im0s1, vid_cap1, s1 = data1
+        path2, im2, im0s2, vid_cap2, s2 = data2
+
+        cv2.imwrite("imgIM0S1.jpg", im0s1)
+        cv2.imwrite("imgIM0S2.jpg", im0s2)
+
+        seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres,
+                            iou_thres, classes, agnostic_nms, max_det, seen, webcam1,dataset1, save_crop, Annotator, line_thickness, names, scale_boxes,
+                            save_txt, xyxy2xywh, save_conf, save_img1, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path1, vid_writer1,
                             label_img, operador)
+
+
 
     # Print results
     t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
-    if save_txt or save_img:
+    if save_txt or save_img1:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
@@ -141,7 +171,8 @@ def run(
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolov5s.pt', help='model path or triton URL')
-    parser.add_argument('--source', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
+    parser.add_argument('--source1', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
+    parser.add_argument('--source2', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
