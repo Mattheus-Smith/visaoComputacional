@@ -50,7 +50,7 @@ from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
 from GetFrame import getFrame
-
+cont = 1
 
 @smart_inference_mode()
 def run(
@@ -85,6 +85,7 @@ def run(
         label_img = ROOT,
         operador = ROOT
 ):
+    global cont
     source1 = str(source1)
     save_img1 = not nosave and not source1.endswith('.txt')  # save inference images
     is_file1 = Path(source1).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
@@ -113,27 +114,37 @@ def run(
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_img_size(imgsz, s=stride)  # check image size
 
+    print("antes dos ifs")
+
     # Dataloader
     bs = 1  # batch_size
     if webcam1:
+        print("opcao1- 1")
         view_img = check_imshow(warn=True)
         dataset1 = LoadStreams(source1, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
         bs = len(dataset1)
     elif screenshot1:
+        print("opcao2- 1")
         dataset1 = LoadScreenshots(source1, img_size=imgsz, stride=stride, auto=pt)
     else:
+        print("opcao3 - 1")
         dataset1 = LoadImages(source1, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
     vid_path1, vid_writer1 = [None] * bs, [None] * bs
 
     if webcam2:
+        print("opcao1- 1")
         view_img = check_imshow(warn=True)
         dataset2 = LoadStreams(source2, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
         bs = len(dataset2)
     elif screenshot2:
+        print("opcao2- 2")
         dataset2 = LoadScreenshots(source2, img_size=imgsz, stride=stride, auto=pt)
     else:
+        print("opcao3 - 2")
         dataset2 = LoadImages(source2, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
     vid_path2, vid_writer2 = [None] * bs, [None] * bs
+
+    print("depois dos ifs")
 
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
@@ -147,9 +158,11 @@ def run(
         # processa os dados de cada instância
         path1, im1, im0s1, vid_cap1, s1 = data1
         path2, im2, im0s2, vid_cap2, s2 = data2
+        # print(cont)
 
-        cv2.imwrite("imgIM0S1.jpg", im0s1)
-        cv2.imwrite("imgIM0S2.jpg", im0s2)
+        cv2.imwrite("./testeFrames/frame1/imgIM0S1_"+str(cont)+".jpg", im0s1)
+        cv2.imwrite("./testeFrames/frame2/imgIM0S2_"+str(cont)+".jpg", im0s2)
+        cont += 1
 
         seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres,
                             iou_thres, classes, agnostic_nms, max_det, seen, webcam1,dataset1, save_crop, Annotator, line_thickness, names, scale_boxes,
@@ -199,7 +212,7 @@ def parse_opt():
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
     parser.add_argument('--label_img', type=int, default=0, help='if show label or not')
-    parser.add_argument('--operador', type=int, default=1, help='which option use')
+    parser.add_argument('--operador', type=int, default=0, help='which option use')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     print_args(vars(opt))
