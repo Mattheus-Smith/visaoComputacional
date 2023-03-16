@@ -62,6 +62,8 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                 n = (det[:, 5] == c).sum()  # detections per class
                 s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
+            cones_position = []
+
             # Write results
             for *xyxy, conf, cls in reversed(det):
                 if save_txt:  # Write to file
@@ -73,9 +75,18 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                 if save_img or save_crop or view_img:  # Add bbox to image
                     c = int(cls)  # integer class
                     label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
+
+                    p1, p2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
+                    print(type(label))
+                    if label == "person":
+                        print("teste")
+                        cones_position.append([p1,p2])
+
                     annotator.box_label(xyxy, label, color=colors(c, True), operador=operador, label_img=label_img)
                 if save_crop:
                     save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
+
+            print(cones_position)
 
         # Stream results
         im0 = annotator.result()
