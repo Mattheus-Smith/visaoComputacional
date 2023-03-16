@@ -50,7 +50,7 @@ from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
 from GetFrame import getFrame
-cont = 1
+cont = 700
 
 @smart_inference_mode()
 def run(
@@ -114,37 +114,37 @@ def run(
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_img_size(imgsz, s=stride)  # check image size
 
-    print("antes dos ifs")
+    #print("antes dos ifs")
 
     # Dataloader
     bs = 1  # batch_size
     if webcam1:
-        print("opcao1- 1")
+        #print("opcao1- 1")
         view_img = check_imshow(warn=True)
         dataset1 = LoadStreams(source1, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
         bs = len(dataset1)
     elif screenshot1:
-        print("opcao2- 1")
+        #print("opcao2- 1")
         dataset1 = LoadScreenshots(source1, img_size=imgsz, stride=stride, auto=pt)
     else:
-        print("opcao3 - 1")
+        #print("opcao3 - 1")
         dataset1 = LoadImages(source1, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
     vid_path1, vid_writer1 = [None] * bs, [None] * bs
 
     if webcam2:
-        print("opcao1- 1")
+        #print("opcao1- 1")
         view_img = check_imshow(warn=True)
         dataset2 = LoadStreams(source2, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
         bs = len(dataset2)
     elif screenshot2:
-        print("opcao2- 2")
+        #print("opcao2- 2")
         dataset2 = LoadScreenshots(source2, img_size=imgsz, stride=stride, auto=pt)
     else:
-        print("opcao3 - 2")
+        #print("opcao3 - 2")
         dataset2 = LoadImages(source2, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
     vid_path2, vid_writer2 = [None] * bs, [None] * bs
 
-    print("depois dos ifs")
+    #print("depois dos ifs")
 
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
