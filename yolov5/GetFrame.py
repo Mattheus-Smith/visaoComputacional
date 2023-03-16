@@ -12,6 +12,8 @@ from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
 import torch
+from funcoesExtras.DesenhoCampDrone import *
+from funcoesExtras.homografiaCampDrone import *
 
 def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres, iou_thres,
              classes, agnostic_nms, max_det, seen, webcam,dataset, save_crop, Annotator, line_thickness, names, scale_boxes, save_txt, xyxy2xywh,
@@ -74,19 +76,19 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
 
                 if save_img or save_crop or view_img:  # Add bbox to image
                     c = int(cls)  # integer class
-                    label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
+                    labels = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
 
                     p1, p2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
-                    print(type(label))
-                    if label == "person":
-                        print("teste")
+                    label = labels.split()
+                    if label[0] == "cone":
                         cones_position.append([p1,p2])
 
-                    annotator.box_label(xyxy, label, color=colors(c, True), operador=operador, label_img=label_img)
+                    annotator.box_label(xyxy, labels, color=colors(c, True), operador=operador, label_img=label_img)
                 if save_crop:
                     save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
-            print(cones_position)
+            #desenhoCampDrone(im0s, cones_position)
+            getHomografiaCampo(im0s, cones_position)
 
         # Stream results
         im0 = annotator.result()
