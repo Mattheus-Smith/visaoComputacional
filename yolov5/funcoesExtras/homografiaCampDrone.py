@@ -10,10 +10,11 @@ def ordenarMaior(cones, posicao):
         posicaoMaior = j-1
 
         for i in range(j, len(cones)):
+            #print("elem: ",cones[i][posicao]," - maior: ",maior)
             if (cones[i][posicao] > maior):
                 aux = cones[posicaoMaior]
-                maior =cones[i]
-                cones[posicaoMaior] = maior
+                maior =cones[i][posicao]
+                cones[posicaoMaior] = cones[i]
                 cones[i] = aux
 
 def ordenarMenor(cones, posicao):
@@ -40,6 +41,7 @@ def getHomografiaCampo(img_src, cones_position):
         y_centro = y1 + int((y2 - y1) / 2)
         pontos.append([x_centro, y_centro])
 
+    #print(pontos)
     ordenarMaior(pontos, 0)
     pontosEspecificos = [pontos[3], pontos[0], pontos[1], pontos[2]]
     # print(pontosEspecificos)
@@ -93,7 +95,8 @@ def desenharLinhas(img, x, y):
             img = cv2.line(img, (0, i*height_dividido), (width, i*height_dividido), (0,0,255), 2)
 
 
-    cv2.imwrite("./outputs/campoComHomografiaComLinha.png", img)
+    return img
+    #cv2.imwrite("./outputs/campoComHomografiaComLinha.png", img)
     # cv2.imshow("saida 1", img)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()

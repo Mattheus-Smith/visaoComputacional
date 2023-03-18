@@ -152,6 +152,16 @@ def run(
 
     #for path1, im1, im0s1, vid_cap1, s1 in dataset2:
 
+    # Defina o nome do arquivo de saída
+    output_video = "output_video.mp4"
+    # Defina as configurações de vídeo
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fps = 30
+    frame_size = (1280, 1024)
+
+    # Crie o objeto VideoWriter
+    out = cv2.VideoWriter(output_video, fourcc, fps, frame_size)
+
     # Itera sobre as duas instâncias juntas
     for data1, data2 in zip(dataset1, dataset2):
 
@@ -167,9 +177,10 @@ def run(
         seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres,
                             iou_thres, classes, agnostic_nms, max_det, seen, webcam1,dataset1, save_crop, Annotator, line_thickness, names, scale_boxes,
                             save_txt, xyxy2xywh, save_conf, save_img1, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path1, vid_writer1,
-                            label_img, operador)
+                            label_img, operador, out, frame_size)
 
-
+    # Fecha o objeto "VideoWriter"
+    out.release()
 
     # Print results
     t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
