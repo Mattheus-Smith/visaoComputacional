@@ -18,6 +18,7 @@ import pandas as pd
 import seaborn as sn
 import torch
 from PIL import Image, ImageDraw, ImageFont
+#from ..funcoesExtras.DetectarCor import *
 
 from utils import TryExcept, threaded
 from utils.general import (CONFIG_DIR, FONT, LOGGER, check_font, check_requirements, clip_boxes, increment_path,
@@ -67,6 +68,33 @@ def check_pil_font(font=FONT, size=10):
         except URLError:  # not online
             return ImageFont.load_default()
 
+def detectarCor(imagem, box):
+    p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
+    roi = imagem[p1[1]: p2[1], p1[0]: p2[0]]
+
+    # conversão para o espaço de cores HSV
+    hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+
+    # criação da máscara para os pixels pretos
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([180, 255, 50])
+
+    # lower_laranja = np.array([5, 50, 50])
+    # upper_laranja = np.array([25, 255, 255])
+
+    mask = cv2.inRange(hsv, lower_black, upper_black)
+
+    # aplicação de uma transformação morfológica para remover pequenos objetos e preencher buracos
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (12, 12))  # img drone -> 36, 36
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+    # aplicação da máscara na imagem original
+    result = cv2.bitwise_and(roi, roi, mask=mask)
+
+    cv2.imshow("saida roi", result)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 
 class Annotator:
     # YOLOv5 Annotator for train/val mosaics and jpgs and detect/hub inference annotations
@@ -84,6 +112,8 @@ class Annotator:
         self.lw = line_width or max(round(sum(im.shape) / 2 * 0.003), 2)  # line width
 
     def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255), operador=1, label_img=0):
+        #color = detectarCor(self.im, box)
+
         # Add one xyxy box to image with label
         if self.pil or not is_ascii(label):
             self.draw.rectangle(box, width=self.lw, outline=color)  # box

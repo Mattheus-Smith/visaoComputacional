@@ -82,13 +82,19 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                     label = labels.split()
                     if label[0] == "cone":
                         cones_position.append([p1,p2])
-
-                    annotator.box_label(xyxy, labels, color=colors(c, True), operador=operador, label_img=label_img)
+                    if label[0] == "ball":
+                        annotator.box_label(xyxy, labels, color=(0,255,255), operador=operador, label_img=label_img)
+                    if label[0] == "person":
+                        annotator.box_label(xyxy, labels, color=(255,0,0), operador=operador, label_img=label_img)
                 if save_crop:
                     save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
+            #print(cones_position)
             #desenhoCampDrone(im0s, cones_position)
-            getHomografiaCampo(im0s, cones_position)
+
+            output = getHomografiaCampo(annotator.im, cones_position)
+            desenharLinhas(output, 16, 12)
+
 
         # Stream results
         im0 = annotator.result()

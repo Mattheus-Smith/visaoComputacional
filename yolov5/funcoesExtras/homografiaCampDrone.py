@@ -2,19 +2,19 @@ import cv2
 import numpy as np
 
 # Read source image.
-img_src = cv2.imread("./../data/images/imgCampoDrone.jpg")
+#img_src = cv2.imread("./../data/images/imgCampoDrone.jpg")
 
 def ordenarMaior(cones, posicao):
-    for j in range(0,len(cones)):
-        maior = cones[j][posicao]
-        posicaoMaior = j
+    for j in range(1,len(cones)):
+        maior = cones[j-1][posicao]
+        posicaoMaior = j-1
 
         for i in range(j, len(cones)):
             if (cones[i][posicao] > maior):
-                aux = maior
-                maior =cones[i][posicao]
-                cones[posicaoMaior][posicao] = maior
-                cones[i][posicao] = aux
+                aux = cones[posicaoMaior]
+                maior =cones[i]
+                cones[posicaoMaior] = maior
+                cones[i] = aux
 
 def ordenarMenor(cones, posicao):
     for j in range(0,len(cones)):
@@ -36,12 +36,13 @@ def getHomografiaCampo(img_src, cones_position):
         y1 = int(cone[0][1])
         x2 = int(cone[1][0]);
         y2 = int(cone[1][1])
-        x_centro = x1 + int((x2 - x1) / 2);
+        x_centro = x1 + int((x2 - x1) / 2)
         y_centro = y1 + int((y2 - y1) / 2)
         pontos.append([x_centro, y_centro])
 
     ordenarMaior(pontos, 0)
     pontosEspecificos = [pontos[3], pontos[0], pontos[1], pontos[2]]
+    # print(pontosEspecificos)
 
     # Four corners of the 3D court + mid-court circle point in source image
     # Start top-left corner and go anti-clock wise + mid-court circle point
@@ -73,25 +74,27 @@ def getHomografiaCampo(img_src, cones_position):
     # rotate image
     #Rotated_image = cv2.rotate(out, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-    # cv2.imwrite("./outputs/campoComHomografia.jpg", out)
+    cv2.imwrite("./outputs/campoComHomografia.jpg", out)
     # cv2.imshow("saida", out)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
     return out
 
 def desenharLinhas(img, x, y):
-    height, width,_  = img.shape
+    height, width,_ = img.shape
 
     width_dividido = width//x
     height_dividido = height//y
 
-    for i in range(1,x):
-        img = cv2.line(img, (i*width_dividido,0), (i*width_dividido, height), (0,0,255), 2)
+    for j in range(1,x):
+        for i in range(1, y):
+            if(i == 1):
+                img = cv2.line(img, (j * width_dividido, 0), (j * width_dividido, height), (0, 0, 255), 2)
+            img = cv2.line(img, (0, i*height_dividido), (width, i*height_dividido), (0,0,255), 2)
 
-    for i in range(1,y):
-        img = cv2.line(img, (0, i*height_dividido), (width, i*height_dividido), (0,0,255), 2)
 
-    # cv2.imshow("saida", img)
+    cv2.imwrite("./outputs/campoComHomografiaComLinha.png", img)
+    # cv2.imshow("saida 1", img)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
 

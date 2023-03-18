@@ -23,6 +23,7 @@ def desenhoCampDrone(img_src, cones_position):
 
     # cv2.fillPoly(img_src, [pts_src], 255)
     cv2.polylines(img_src, [pts_src], isClosed=True, color=[255, 0, 0], thickness=2)
+    #cv2.circle(img_src, (pts_src[1]),2, (0,0,255), 2)
     cv2.imwrite("./outputs/campoDelimitado.jpg", img_src)
 
 # desenhoCampDrone(img_src, cones)
