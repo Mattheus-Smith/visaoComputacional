@@ -161,7 +161,7 @@ def run(
 
     # Crie o objeto VideoWriter
     out = cv2.VideoWriter(output_video, fourcc, fps, frame_size)
-
+    cont = 0
     # Itera sobre as duas instâncias juntas
     for data1, data2 in zip(dataset1, dataset2):
 
@@ -170,6 +170,9 @@ def run(
         path2, im2, im0s2, vid_cap2, s2 = data2
         # print(cont)
 
+        if (cont == 0):
+            cv2.imwrite("./testeFrames/frameTeste/imgIM0S1_" + str(cont) + ".jpg", im0s1)
+            cont+= 1
         #cv2.imwrite("./testeFrames/frame1/imgIM0S1_"+str(cont)+".jpg", im0s1)
         #cv2.imwrite("./testeFrames/frame2/imgIM0S2_"+str(cont)+".jpg", im0s2)
         #cont += 1

@@ -1,65 +1,28 @@
-import cv2
 import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.image as mpimg
 
-# Cria uma figura com tamanho 1280x1024
-fig = plt.figure(figsize=(12.8, 10.24))
+# carrega uma imagem
+img = mpimg.imread('campoComHomografia.jpg')
 
-# Adiciona um objeto Axes à figura
-ax = fig.add_subplot(111)
+# cria um conjunto de eixos
+fig, ax = plt.subplots(figsize=(16, 20))
+# 14,12 -> 1141x612
+# 15x15 -> 1218x649
+# 16x20 -> 1296x686
 
-# Desenha uma imagem aleatória no objeto Axes
-img = cv2.imread('campoComHomografia.jpg')
+# mostra a imagem nos eixos
 ax.imshow(img)
 
-# Ajusta o tamanho e a proporção da imagem mostrada no plot
-ax.set_aspect('equal')
-fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+# adiciona um ponto e especifica a legenda
+ax.plot(0,0, 'bo') #b-> blue ; o -> circuli vazio
+ax.plot(0,0, 'rs') #r-> red ; s -> quadrado(square)
+ax.plot(0,0, '^', color='yellow', markersize=10)
 
-# Salva a imagem em um arquivo JPEG
-fig.savefig('imagemSemAjuste.jpg')
+# mostra a legenda
+ax.legend(labels = ['jogador', 'bola' ,'cone'], loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=1)
 
+# Salvar a figura
+plt.savefig('grafico_com_legenda.png', bbox_inches='tight')
 
-
-
-# import matplotlib.pyplot as plt
-# import numpy as np
-#
-# # Cria uma figura com tamanho 800x600
-# fig = plt.figure(figsize=(8, 6))
-#
-# # Adiciona um objeto Axes à figura
-# ax = fig.add_subplot(111)
-#
-# # Desenha uma imagem aleatória no objeto Axes
-# img = np.random.rand(600, 800, 3)
-# ax.imshow(img)
-#
-# # Salva a imagem em um arquivo JPEG
-# fig.savefig('imagem.jpg')
-
-
-# # Cria uma lista de imagens do Matplotlib
-# fig, axs = plt.subplots(2, 2, figsize=(10, 10))
-# imgs = []
-# for i, ax in enumerate(axs.flat):
-#     ax.plot([1, 2, 3, 4])
-#     ax.set_xlabel('Eixo X')
-#     ax.set_ylabel('Eixo Y')
-#     ax.set_title(f'Gráfico {i+1}')
-#     canvas = fig.canvas
-#     canvas.draw()
-#     img = np.array(canvas.renderer.buffer_rgba())
-#     imgs.append(img)
-#
-# # Cria um objeto VideoWriter
-# fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-# out = cv2.VideoWriter('output.mp4', fourcc, 30.0, (imgs[0].shape[1], imgs[0].shape[0]))
-#
-# # Adiciona as imagens ao arquivo de vídeo
-# for img in imgs:
-#     out.write(img)
-#
-# # Libera os recursos
-# out.release()
-# plt.close()
+fig_size = fig.get_size_inches()
+print('Tamanho do gráfico:', fig_size[0]*100, 'x', fig_size[1]*100, 'pixels')
