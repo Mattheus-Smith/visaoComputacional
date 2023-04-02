@@ -93,11 +93,27 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
             #desenhoCampDrone(im0s, cones_position)
             if(len(cones_position) > 4):
                 cv2.imwrite("./outputs/erro_cone_"+str(cont)+"_cones_"+str(len(cones_position))+".jpg", annotator.im)
+                # cria uma janela vazia
+                cv2.namedWindow('Imagem', cv2.WINDOW_NORMAL)
+
+                # define o tamanho da janela
+                cv2.resizeWindow('Imagem', 800, 600)
+                for i in range(len(cones_position)):
+                    cone = cones_position[i]
+                    x1 = int(cone[0][0])
+                    y1 = int(cone[0][1])
+                    x2 = int(cone[1][0])
+                    y2 = int(cone[1][1])
+                    roi = annotator.im[y1:y2, x1:x2]
+                    # #roi = imagem[x1y1[1]: x2y2[1], x1y1[0]: x2y2[0]]
+                    cv2.imshow("Imagem", roi)
+                    cv2.waitKey(0)
             else:
                 homografia = getHomografiaCampo(annotator.im, cones_position)
                 linhas = desenharLinhas(homografia, 16, 12)
                 out.write(cv2.resize(linhas, frame_size))
 
+            cv2.destroyAllWindows()
         # Stream results
         im0 = annotator.result()
         if view_img:
