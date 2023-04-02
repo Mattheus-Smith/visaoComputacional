@@ -50,7 +50,7 @@ from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
 from GetFrame import getFrame
-cont = 700
+cont = 1
 
 @smart_inference_mode()
 def run(
@@ -161,7 +161,7 @@ def run(
 
     # Crie o objeto VideoWriter
     out = cv2.VideoWriter(output_video, fourcc, fps, frame_size)
-    cont = 0
+    #cont = 0
     # Itera sobre as duas instâncias juntas
     for data1, data2 in zip(dataset1, dataset2):
 
@@ -170,9 +170,9 @@ def run(
         path2, im2, im0s2, vid_cap2, s2 = data2
         # print(cont)
 
-        if (cont == 0):
-            cv2.imwrite("./testeFrames/frameTeste/imgIM0S1_" + str(cont) + ".jpg", im0s1)
-            cont+= 1
+        # if (cont == 0):
+        #     cv2.imwrite("./testeFrames/frameTeste/imgIM0S1_" + str(cont) + ".jpg", im0s1)
+        #     cont+= 1
         #cv2.imwrite("./testeFrames/frame1/imgIM0S1_"+str(cont)+".jpg", im0s1)
         #cv2.imwrite("./testeFrames/frame2/imgIM0S2_"+str(cont)+".jpg", im0s2)
         #cont += 1
@@ -180,7 +180,8 @@ def run(
         seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres,
                             iou_thres, classes, agnostic_nms, max_det, seen, webcam1,dataset1, save_crop, Annotator, line_thickness, names, scale_boxes,
                             save_txt, xyxy2xywh, save_conf, save_img1, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path1, vid_writer1,
-                            label_img, operador, out, frame_size)
+                            label_img, operador, out, frame_size, cont)
+        cont += 1
 
     # Fecha o objeto "VideoWriter"
     out.release()

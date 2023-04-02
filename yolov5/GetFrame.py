@@ -17,7 +17,7 @@ from funcoesExtras.homografiaCampDrone import *
 
 def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres, iou_thres,
              classes, agnostic_nms, max_det, seen, webcam,dataset, save_crop, Annotator, line_thickness, names, scale_boxes, save_txt, xyxy2xywh,
-             save_conf, save_img, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path, vid_writer, label_img, operador, out, frame_size):
+             save_conf, save_img, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path, vid_writer, label_img, operador, out, frame_size, cont):
 
     with dt[0]:
         im = torch.from_numpy(im).to(model.device)
@@ -37,7 +37,6 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
 
     # Second-stage classifier (optional)
     # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s
-
     # Process predictions
     for i, det in enumerate(pred):  # per image
         seen += 1
@@ -82,8 +81,9 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                     label = labels.split()
                     if label[0] == "cone":
                         cones_position.append([p1,p2])
+                        annotator.box_label(xyxy, labels, color=(0, 255, 255), operador=operador, label_img=label_img)
                     if label[0] == "ball":
-                        annotator.box_label(xyxy, labels, color=(0,255,255), operador=operador, label_img=label_img)
+                        annotator.box_label(xyxy, labels, color=(0,255,0), operador=operador, label_img=label_img)
                     if label[0] == "person":
                         annotator.box_label(xyxy, labels, color=(255,0,0), operador=operador, label_img=label_img)
                 if save_crop:
@@ -91,11 +91,12 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
 
             #print(cones_position)
             #desenhoCampDrone(im0s, cones_position)
-
-            homografia = getHomografiaCampo(annotator.im, cones_position)
-
-            linhas = desenharLinhas(homografia, 16, 12)
-            out.write(cv2.resize(linhas, frame_size))
+            if(len(cones_position) > 4):
+                cv2.imwrite("./outputs/erro_cone_"+str(cont)+"_cones_"+str(len(cones_position))+".jpg", annotator.im)
+            else:
+                homografia = getHomografiaCampo(annotator.im, cones_position)
+                linhas = desenharLinhas(homografia, 16, 12)
+                out.write(cv2.resize(linhas, frame_size))
 
         # Stream results
         im0 = annotator.result()

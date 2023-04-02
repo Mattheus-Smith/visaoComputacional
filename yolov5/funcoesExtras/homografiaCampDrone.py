@@ -18,16 +18,16 @@ def ordenarMaior(cones, posicao):
                 cones[i] = aux
 
 def ordenarMenor(cones, posicao):
-    for j in range(0,len(cones)):
-        menor = cones[j][posicao]
-        posicaoMaior = j
+    for j in range(1,len(cones)):
+        menor = cones[j-1][posicao]
+        posicaoMaior = j-1
 
         for i in range(j, len(cones)):
             if (cones[i][posicao] < menor):
-                aux = menor
-                menor =cones[i][posicao]
-                cones[posicaoMaior][posicao] = menor
-                cones[i][posicao] = aux
+                aux = cones[posicaoMaior]
+                menor = cones[i][posicao]
+                cones[posicaoMaior] = cones[i]
+                cones[i] = aux
 
 def getHomografiaCampo(img_src, cones_position):
     pontos = []
@@ -41,15 +41,35 @@ def getHomografiaCampo(img_src, cones_position):
         y_centro = y1 + int((y2 - y1) / 2)
         pontos.append([x_centro, y_centro])
 
-    #print(pontos)
-    ordenarMaior(pontos, 0)
-    pontosEspecificos = [pontos[3], pontos[0], pontos[1], pontos[2]]
-    # print(pontosEspecificos)
+    listaConesOrdenados = []
+    if ( len(pontos) == 4):
+        # print("entrada - ",pontos)
+        ordenarMaior(pontos, 1)  # acha os Y maiores
+        # print("Y maiores - ", pontos)
+        listaConesOrdenados.append(pontos[0]);
+        listaConesOrdenados.append(pontos[1])
+        pontos.pop(1);
+        pontos.pop(0)
+        ordenarMenor(listaConesOrdenados, 0)
+
+        ordenarMenor(pontos, 1)  # acha os Y menores
+        # print("Y menores - ", pontos)
+        ordenarMaior(pontos, 0)  # acha os X maiores
+        listaConesOrdenados.append(pontos[0]);
+        listaConesOrdenados.append(pontos[1])
+
+        # pontosEspecificos = [pontos[3], pontos[0], pontos[1], pontos[2]]
+        #print(listaConesOrdenados)
+    elif( len(pontos) == 3):
+        print("BO-3")
+    elif( len(pontos) == 5):
+        print("BO-5")
+    else:
+        print("menos - ", len(pontos))
 
     # Four corners of the 3D court + mid-court circle point in source image
     # Start top-left corner and go anti-clock wise + mid-court circle point
-    pts_src = np.float32(pontosEspecificos)  # C, D
-    # print(pts_src)
+    pts_src = np.float32(listaConesOrdenados)  # C, D
 
     # encontrar a largura maxima
     width_AB = np.sqrt(((pts_src[0][0] - pts_src[1][0]) ** 2) + ((pts_src[0][1] - pts_src[1][1]) ** 2))
