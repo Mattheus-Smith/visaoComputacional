@@ -111,8 +111,19 @@ class Annotator:
             self.im = im
         self.lw = line_width or max(round(sum(im.shape) / 2 * 0.003), 2)  # line width
 
-    def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255), operador=1, label_img=0):
+    def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255), operador=1, label_img=0, cont=0):
         #color = detectarCor(self.im, box)
+
+        # p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
+        # #print(p1,p2)
+        # x1 = int(p1[0])
+        # y1 = int(p1[1])
+        # x2 = int(p2[0])
+        # y2 = int(p2[1])
+        # frame = self.im[y1:y2, x1:x2]
+        # texto="./testeFrames/frame{}.png".format(cont)
+        # cv2.imwrite(texto, frame)
+        # print("salvo "+texto)
 
         # Add one xyxy box to image with label
         if self.pil or not is_ascii(label):

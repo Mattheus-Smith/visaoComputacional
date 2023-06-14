@@ -1,0 +1,16 @@
+source ./venvYolo/Scripts/Activate
+
+label_img:
+	1-> com label
+	0-> sem label
+
+operador:
+	1-> centro
+	2->so os pes
+
+#1 so dataset
+ ./venvYolo/Scripts/python detect.py --weights ./weights/2best.pt --source1 ./data/images/DJI_0087_Trim.mp4 --label_img 0 --operador 2       
+
+#1 so dataset
+ ./venvYolo/Scripts/python detect.py --weights ./weights/2best.pt --source1 ./data/images/DJI_0087_Trim.mp4
+--source1 ./data/images/DJI_0087_Trim.mp4 --multiDataSet1 --label_img 0 --operador 2    

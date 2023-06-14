@@ -17,7 +17,8 @@ from funcoesExtras.homografiaCampDrone import *
 
 def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres, iou_thres,
              classes, agnostic_nms, max_det, seen, webcam,dataset, save_crop, Annotator, line_thickness, names, scale_boxes, save_txt, xyxy2xywh,
-             save_conf, save_img, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path, vid_writer, label_img, operador, out, frame_size, cont):
+             save_conf, save_img, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path, vid_writer, label_img,
+             operador, out, frame_size, cont):
 
     with dt[0]:
         im = torch.from_numpy(im).to(model.device)
@@ -64,7 +65,6 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                 s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
             cones_position = []
-
             # Write results
             for *xyxy, conf, cls in reversed(det):
                 if save_txt:  # Write to file
@@ -79,41 +79,52 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
 
                     p1, p2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
                     label = labels.split()
+
+                    x1 = int(p1[0])
+                    y1 = int(p1[1])
+                    x2 = int(p2[0])
+                    y2 = int(p2[1])
+                    frame = im0s[y1:y2, x1:x2]
+                    texto="./testeFrames/frame{}.png".format(cont)
+                    cv2.imwrite(texto, frame)
+                    print("salvo "+texto)
+
                     if label[0] == "cone":
                         cones_position.append([p1,p2])
-                        annotator.box_label(xyxy, labels, color=(0, 255, 255), operador=operador, label_img=label_img)
+                        annotator.box_label(xyxy, labels, color=(0, 255, 255), operador=operador, label_img=label_img, cont=cont)
                     if label[0] == "ball":
-                        annotator.box_label(xyxy, labels, color=(0,255,0), operador=operador, label_img=label_img)
+                        annotator.box_label(xyxy, labels, color=(0,255,0), operador=operador, label_img=label_img, cont=cont)
                     if label[0] == "person":
-                        annotator.box_label(xyxy, labels, color=(255,0,0), operador=operador, label_img=label_img)
+                        annotator.box_label(xyxy, labels, color=(255,0,0), operador=operador, label_img=label_img, cont=cont)
                 if save_crop:
                     save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
+                cont +=1
 
             #print(cones_position)
             #desenhoCampDrone(im0s, cones_position)
-            if(len(cones_position) > 4):
-                cv2.imwrite("./outputs/erro_cone_"+str(cont)+"_cones_"+str(len(cones_position))+".jpg", annotator.im)
-                # cria uma janela vazia
-                cv2.namedWindow('Imagem', cv2.WINDOW_NORMAL)
+            # if(len(cones_position) > 4):
+            #     cv2.imwrite("./outputs/erro_cone_"+str(cont)+"_cones_"+str(len(cones_position))+".jpg", annotator.im)
+            #     # cria uma janela vazia
+            #     cv2.namedWindow('Imagem', cv2.WINDOW_NORMAL)
+            #
+            #     # define o tamanho da janela
+            #     cv2.resizeWindow('Imagem', 800, 600)
+            #     for i in range(len(cones_position)):
+            #         cone = cones_position[i]
+            #         x1 = int(cone[0][0])
+            #         y1 = int(cone[0][1])
+            #         x2 = int(cone[1][0])
+            #         y2 = int(cone[1][1])
+            #         roi = annotator.im[y1:y2, x1:x2]
+            #         # #roi = imagem[x1y1[1]: x2y2[1], x1y1[0]: x2y2[0]]
+            #         cv2.imshow("Imagem", roi)
+            #         cv2.waitKey(0)
+            # else:
+            #     homografia = getHomografiaCampo(annotator.im, cones_position)
+            #     linhas = desenharLinhas(homografia, 16, 12)
+            #     out.write(cv2.resize(linhas, frame_size))
 
-                # define o tamanho da janela
-                cv2.resizeWindow('Imagem', 800, 600)
-                for i in range(len(cones_position)):
-                    cone = cones_position[i]
-                    x1 = int(cone[0][0])
-                    y1 = int(cone[0][1])
-                    x2 = int(cone[1][0])
-                    y2 = int(cone[1][1])
-                    roi = annotator.im[y1:y2, x1:x2]
-                    # #roi = imagem[x1y1[1]: x2y2[1], x1y1[0]: x2y2[0]]
-                    cv2.imshow("Imagem", roi)
-                    cv2.waitKey(0)
-            else:
-                homografia = getHomografiaCampo(annotator.im, cones_position)
-                linhas = desenharLinhas(homografia, 16, 12)
-                out.write(cv2.resize(linhas, frame_size))
-
-            cv2.destroyAllWindows()
+            # cv2.destroyAllWindows()
         # Stream results
         im0 = annotator.result()
         if view_img:

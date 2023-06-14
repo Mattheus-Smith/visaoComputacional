@@ -1,0 +1,5 @@
+camisa 1 - 21x44
+camisa 2 - 15x46
+camisa 4 - 30x39
+
+rede -> 15,44

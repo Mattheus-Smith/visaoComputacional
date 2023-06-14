@@ -50,13 +50,14 @@ from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
 from GetFrame import getFrame
-cont = 1
+cont = 740
 
 @smart_inference_mode()
 def run(
         weights=ROOT / 'yolov5s.pt',  # model path or triton URL
         source1=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
         source2=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
+        multiDataSet = 0,
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
@@ -161,27 +162,45 @@ def run(
 
     # Crie o objeto VideoWriter
     out = cv2.VideoWriter(output_video, fourcc, fps, frame_size)
-    #cont = 0
-    # Itera sobre as duas instâncias juntas
-    for data1, data2 in zip(dataset1, dataset2):
+    #cont = 1
+    if (multiDataSet == 0):
+        for path1, im1, im0s1, vid_cap1, s1 in dataset1:
+            # cv2.imwrite("./testeFrames/piloto/imgIM0S1_"+str(cont)+".jpg", im0s1)
+            # cont += 1
 
-        # processa os dados de cada instância
-        path1, im1, im0s1, vid_cap1, s1 = data1
-        path2, im2, im0s2, vid_cap2, s2 = data2
-        # print(cont)
+            seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize,
+                                augment, non_max_suppression, conf_thres,
+                                iou_thres, classes, agnostic_nms, max_det, seen, webcam1, dataset1, save_crop,
+                                Annotator, line_thickness, names, scale_boxes,
+                                save_txt, xyxy2xywh, save_conf, save_img1, view_img, hide_labels, hide_conf,
+                                save_one_box, windows, vid_path1, vid_writer1,
+                                label_img, operador, out, frame_size, cont)
+            cont += 1
+    elif (multiDataSet == 1):
+        # Itera sobre as duas instâncias juntas
+        for data1, data2 in zip(dataset1, dataset2):
+            # processa os dados de cada instância
+            path1, im1, im0s1, vid_cap1, s1 = data1
+            path2, im2, im0s2, vid_cap2, s2 = data2
+            # print(cont)
 
-        # if (cont == 0):
-        #     cv2.imwrite("./testeFrames/frameTeste/imgIM0S1_" + str(cont) + ".jpg", im0s1)
-        #     cont+= 1
-        #cv2.imwrite("./testeFrames/frame1/imgIM0S1_"+str(cont)+".jpg", im0s1)
-        #cv2.imwrite("./testeFrames/frame2/imgIM0S2_"+str(cont)+".jpg", im0s2)
-        #cont += 1
+            # if (cont == 0):
+            #     cv2.imwrite("./testeFrames/frameTeste/imgIM0S1_" + str(cont) + ".jpg", im0s1)
+            #     cont+= 1
+            # cv2.imwrite("./testeFrames/frame1/imgIM0S1_"+str(cont)+".jpg", im0s1)
+            # cv2.imwrite("./testeFrames/frame2/imgIM0S2_"+str(cont)+".jpg", im0s2)
+            # cont += 1
 
-        seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres,
-                            iou_thres, classes, agnostic_nms, max_det, seen, webcam1,dataset1, save_crop, Annotator, line_thickness, names, scale_boxes,
-                            save_txt, xyxy2xywh, save_conf, save_img1, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path1, vid_writer1,
-                            label_img, operador, out, frame_size, cont)
-        cont += 1
+            seen, dt = getFrame(path1, im1, im0s1, vid_cap1, s1, dt, model, increment_path, save_dir, visualize,
+                                augment, non_max_suppression, conf_thres,
+                                iou_thres, classes, agnostic_nms, max_det, seen, webcam1, dataset1, save_crop,
+                                Annotator, line_thickness, names, scale_boxes,
+                                save_txt, xyxy2xywh, save_conf, save_img1, view_img, hide_labels, hide_conf,
+                                save_one_box, windows, vid_path1, vid_writer1,
+                                label_img, operador, out, frame_size, cont)
+            cont += 1
+    else:
+        print("MultiDataSet dff de 1 e 0!!\n")
 
     # Fecha o objeto "VideoWriter"
     out.release()
@@ -201,6 +220,7 @@ def parse_opt():
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolov5s.pt', help='model path or triton URL')
     parser.add_argument('--source1', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--source2', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
+    parser.add_argument('--multiDataSet', type=int, default=0 , help='to activate the multiple option')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
