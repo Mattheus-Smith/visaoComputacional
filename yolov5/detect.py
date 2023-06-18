@@ -176,6 +176,7 @@ def run(
                                 save_one_box, windows, vid_path1, vid_writer1,
                                 label_img, operador, out, frame_size, cont)
             cont += 1
+
     elif (multiDataSet == 1):
         # Itera sobre as duas instâncias juntas
         for data1, data2 in zip(dataset1, dataset2):

@@ -15,6 +15,34 @@ import torch
 from funcoesExtras.DesenhoCampDrone import *
 from funcoesExtras.homografiaCampDrone import *
 
+# TensorFlow e tf.keras
+import tensorflow as tf
+from tensorflow import keras
+
+# Bibliotecas Auxiliares
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+def usar_modelo(frame):
+    model = keras.models.load_model('./weights/weight_v3.h5')
+
+    # Converter para níveis de cinza
+    imagem_cinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Redimensionamento da imagem (opcional)
+    imagem = cv2.resize(imagem_cinza, (15, 44))
+    imagem = np.array([imagem])
+
+    imagem = imagem / 255.0
+    imagem = np.expand_dims(imagem, axis=-1)
+
+    predictions = model.predict(imagem)
+
+    texto = "predicao-> {} | resultado-> {}".format(predictions, np.argmax(predictions))
+    #print(texto)
+    return np.argmax(predictions)
+
 def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, visualize, augment, non_max_suppression, conf_thres, iou_thres,
              classes, agnostic_nms, max_det, seen, webcam,dataset, save_crop, Annotator, line_thickness, names, scale_boxes, save_txt, xyxy2xywh,
              save_conf, save_img, view_img, hide_labels, hide_conf, save_one_box, windows, vid_path, vid_writer, label_img,
@@ -85,20 +113,24 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                     x2 = int(p2[0])
                     y2 = int(p2[1])
                     frame = im0s[y1:y2, x1:x2]
-                    texto="./testeFrames/frame{}.png".format(cont)
-                    cv2.imwrite(texto, frame)
-                    print("salvo "+texto)
+                    # texto="./testeFrames/frame{}.png".format(cont)
+                    # cv2.imwrite(texto, frame)
+                    # print("salvo "+texto)
 
                     if label[0] == "cone":
                         cones_position.append([p1,p2])
-                        annotator.box_label(xyxy, labels, color=(0, 255, 255), operador=operador, label_img=label_img, cont=cont)
+                        annotator.box_label(xyxy, labels, color=(0, 255, 255), operador=operador, label_img=label_img, cont=cont, jogador=0)
                     if label[0] == "ball":
-                        annotator.box_label(xyxy, labels, color=(0,255,0), operador=operador, label_img=label_img, cont=cont)
+                        annotator.box_label(xyxy, labels, color=(255,0,0), operador=operador, label_img=label_img, cont=cont, jogador=0)
                     if label[0] == "person":
-                        annotator.box_label(xyxy, labels, color=(255,0,0), operador=operador, label_img=label_img, cont=cont)
+                        cor = (255,annotator.rosa,255)
+                        annotator.players_position.append([p1,p2, usar_modelo(frame), cor])
+                        annotator.box_label(xyxy, labels, color=cor, operador=operador, label_img=label_img, cont=cont, jogador=1)
                 if save_crop:
                     save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                 cont +=1
+
+            #print(players_position)
 
             #print(cones_position)
             #desenhoCampDrone(im0s, cones_position)
@@ -122,6 +154,13 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
             # else:
             #     homografia = getHomografiaCampo(annotator.im, cones_position)
             #     linhas = desenharLinhas(homografia, 16, 12)
+            #     out.write(cv2.resize(linhas, frame_size))
+
+            # imagem_para_homogradia = im0s.copy()
+
+            homografia = getHomografiaCampo(annotator.homografia, cones_position)
+            # linhas = desenharLinhas(homografia, 16, 12)
+            segmentarMatriz(homografia, 16,12)
             #     out.write(cv2.resize(linhas, frame_size))
 
             # cv2.destroyAllWindows()

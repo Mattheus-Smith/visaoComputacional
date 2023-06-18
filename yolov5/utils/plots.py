@@ -109,9 +109,14 @@ class Annotator:
                                        size=font_size or max(round(sum(self.im.size) / 2 * 0.035), 12))
         else:  # use cv2
             self.im = im
+            self.homografia = im.copy()
+            self.rosa = 17
+            self.players_position = []
+            self.dict_players=[]
         self.lw = line_width or max(round(sum(im.shape) / 2 * 0.003), 2)  # line width
 
-    def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255), operador=1, label_img=0, cont=0):
+    def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255), operador=1, label_img=0, cont=0, jogador=0):
+
         #color = detectarCor(self.im, box)
 
         # p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
@@ -169,8 +174,15 @@ class Annotator:
 
             xcx = x1 + int((x2 - x1) / 2)
             #xcy = y1 + int((y2 - y1) / 2)
+            #print("posicao: " + str(xcx) + " - "+ str(y2))
 
             cv2.circle(self.im, (xcx, y2), radius, color, thickness, lineType=8, shift=0)
+
+            if jogador == 1:
+                texto = "cor {},{},{}".format(color[0], color[1], color[2])
+                print(texto)
+                cv2.circle(self.homografia, (xcx, y2), radius, color, thickness, lineType=8, shift=0)
+                self.rosa += 17
 
         else:  # cv2
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
