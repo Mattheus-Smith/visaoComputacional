@@ -179,9 +179,10 @@ class Annotator:
             cv2.circle(self.im, (xcx, y2), radius, color, thickness, lineType=8, shift=0)
 
             if jogador == 1:
-                texto = "cor {},{},{}".format(color[0], color[1], color[2])
+                texto = "cor {},{},{}".format(255, self.rosa, 255)
+                cor = (255,self.rosa,255)
                 print(texto)
-                cv2.circle(self.homografia, (xcx, y2), radius, color, thickness, lineType=8, shift=0)
+                cv2.circle(self.homografia, (xcx, y2), radius, cor, thickness, lineType=8, shift=0)
                 self.rosa += 17
 
         else:  # cv2

@@ -25,7 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def usar_modelo(frame):
-    model = keras.models.load_model('./weights/weight_v3.h5')
+    model = keras.models.load_model('./weights/weight_v1.h5')
 
     # Converter para níveis de cinza
     imagem_cinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -125,7 +125,7 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                     if label[0] == "person":
                         cor = (255,annotator.rosa,255)
                         annotator.players_position.append([p1,p2, usar_modelo(frame), cor])
-                        annotator.box_label(xyxy, labels, color=cor, operador=operador, label_img=label_img, cont=cont, jogador=1)
+                        annotator.box_label(xyxy, labels, color=(255,17,255), operador=operador, label_img=label_img, cont=cont, jogador=1)
                 if save_crop:
                     save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                 cont +=1
@@ -159,16 +159,37 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
             # imagem_para_homogradia = im0s.copy()
 
             homografia = getHomografiaCampo(annotator.homografia, cones_position)
+            homografia = getHomografiaCampo(annotator.homografia, cones_position)
             # linhas = desenharLinhas(homografia, 16, 12)
-            matriz, position_plys_matriz = segmentarMatriz(homografia, 16,12)
-            #     out.write(cv2.resize(linhas, frame_size))
-            # Imprime a matriz resultante
+            # out.write(cv2.resize(linhas, frame_size))
 
+            matriz_campo, position_plys_matriz = segmentarMatriz(homografia, 16,12)
+
+            # Imprime a matriz resultante
             # for linha in annotator.players_position:
             #     print(linha)
             # print("\n")
 
-            verificar_rgb_na_matriz(annotator.players_position, position_plys_matriz)
+            position_plys_matriz = verificar_se_cor_bgr_pertece_a_matriz(annotator.players_position, position_plys_matriz)
+            #ele esta unindo dados em uma matriz so
+            #1- ele da como entrada a matriz antiga(annotator.players_position) que contem
+            #   * posicao de cada jogador
+            #   * numero da camisa do jogaodor
+            #   * e cor q foi dada ao jogador(q é usada para identificar ele na segmentação)
+            #2- e tem como entrada a matriz que contem a posicao de cada jogador(position_plys_matriz) na matriz do campo(matriz_campo)
+            # na qual ele faz o seguinte processo
+            #   * ele pega o BRG dado ao jogador
+            #   * dps ele percore toda a lista de filtros(lower e upper) ate da match
+            #   * quando da match ele sabe qual é o filtro que foi usado durante a segmentação, logo, tem um fator comum, o filtro
+            #pois voce pode verificar com o filtro q voce acabou de descobri se existe em position_plys_matriz
+            #com isso eu sei a cor atribuida a ele e o numero a sua camisa, logo posso adicionar essa informação em position_plys_matriz
+            #tendo assim uma matriz de informação completa contedo:
+            #   * i e j para encontrar o jogador na matriz_campo
+            #   * filtro de cor usada
+            #   * numero da camisa
+
+            for linha in position_plys_matriz:
+                print(linha[0], linha[1], linha[3], linha[4], linha[5])
 
             # cv2.destroyAllWindows()
         # Stream results

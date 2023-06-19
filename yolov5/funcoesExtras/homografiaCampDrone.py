@@ -257,7 +257,7 @@ def segmentarMatriz(img, x, y):
 
     return matriz, check_cor
 
-def verificar_rgb_na_matriz(lista, position_plys_matriz):
+def verificar_se_cor_bgr_pertece_a_matriz(lista, position_plys_matriz):
 
     listaNova = position_plys_matriz.copy()
 
@@ -274,6 +274,4 @@ def verificar_rgb_na_matriz(lista, position_plys_matriz):
                 listaNova[contador][5] = lista[contador][2]
                 texto = "pertence ao intervalo i={} hsv={}".format(0, hsv_color)
                 # print(texto)
-
-    for linha in listaNova:
-        print(linha[0], linha[1], linha[3], linha[4], linha[5])
+    return listaNova
