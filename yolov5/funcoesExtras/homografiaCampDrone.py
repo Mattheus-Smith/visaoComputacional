@@ -223,9 +223,9 @@ def segmentarMatriz(img, x, y):
                     #print("A cor rosa foi encontrada na imagem.")
                     matriz[i][j] += 1
                     flags_cor[contador] += 1
-                    check_cor.append([i, j, bloco,lower, upper])
+                    check_cor.append([i, j, bloco,lower, upper,0])
                     texto = "{},{} | bloco_{}_{}.png | {}\n".format(lower, upper, i, j, contador)
-                    print(texto)
+                    # print(texto)
                 elif(cor_encontrada and flags_cor[contador] != 0):
                     # texto = "{},{} | bloco_{}_{}.png | repetiu!!!\n".format(lower, upper, i, j)
                     # print(texto)
@@ -237,8 +237,8 @@ def segmentarMatriz(img, x, y):
                     for vector in check_cor:
                         if np.array_equal(vector[3], lower) and np.array_equal(vector[4], upper):
                             texto="vetor encontrado: {} {} {} {}".format(vector[0], vector[1], vector[3], vector[4])
-                            print(texto)
-                            vetorB = [i, j, bloco,lower, upper]
+                            # print(texto)
+                            vetorB = [i, j, bloco,lower, upper, 0]
                             areaA, areaB = verificar_duplicidade_cor(vector, vetorB)
 
                             if areaB > areaA:
@@ -249,10 +249,31 @@ def segmentarMatriz(img, x, y):
                     break
 
     # for linha in check_cor:
-    #     print(linha[0], linha[1], linha[3], linha[4])
-    #
-    # # Imprime a matriz resultante
-    # for linha in matriz:
-    #     print(linha)
+    #     print(linha[0], linha[1], linha[3], linha[4], linha[5])
 
-    return matriz
+    # Imprime a matriz resultante
+    for linha in matriz:
+        print(linha)
+
+    return matriz, check_cor
+
+def verificar_rgb_na_matriz(lista, position_plys_matriz):
+
+    listaNova = position_plys_matriz.copy()
+
+    for vetor in lista:
+        rgb_color = np.array([vetor[3][0], vetor[3][1], vetor[3][2]], dtype=np.uint8)
+        bgr_color = rgb_color.reshape(1, 1, 3)  # Converter para formato BGR
+        hsv_color = cv2.cvtColor(bgr_color, cv2.COLOR_BGR2HSV)
+
+        # print(vetor[3], hsv_color, hsv_color.shape, lower[0], upper[0])
+        for lower, upper, contador in zip(lowers, uppers, range(0, len(lowers))):
+            if (lower[0] <= hsv_color[0][0][0] <= upper[0] and
+                    lower[1] <= hsv_color[0][0][1] <= upper[1] and
+                    lower[2] <= hsv_color[0][0][2] <= upper[2]):
+                listaNova[contador][5] = lista[contador][2]
+                texto = "pertence ao intervalo i={} hsv={}".format(0, hsv_color)
+                # print(texto)
+
+    for linha in listaNova:
+        print(linha[0], linha[1], linha[3], linha[4], linha[5])

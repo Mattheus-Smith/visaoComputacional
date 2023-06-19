@@ -113,9 +113,9 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
                     x2 = int(p2[0])
                     y2 = int(p2[1])
                     frame = im0s[y1:y2, x1:x2]
-                    # texto="./testeFrames/frame{}.png".format(cont)
-                    # cv2.imwrite(texto, frame)
-                    # print("salvo "+texto)
+                    texto="./testeFrames/frame{}.png".format(cont)
+                    cv2.imwrite(texto, frame)
+                    print("salvo "+texto)
 
                     if label[0] == "cone":
                         cones_position.append([p1,p2])
@@ -160,8 +160,15 @@ def getFrame(path, im, im0s, vid_cap, s, dt, model, increment_path, save_dir, vi
 
             homografia = getHomografiaCampo(annotator.homografia, cones_position)
             # linhas = desenharLinhas(homografia, 16, 12)
-            segmentarMatriz(homografia, 16,12)
+            matriz, position_plys_matriz = segmentarMatriz(homografia, 16,12)
             #     out.write(cv2.resize(linhas, frame_size))
+            # Imprime a matriz resultante
+
+            # for linha in annotator.players_position:
+            #     print(linha)
+            # print("\n")
+
+            verificar_rgb_na_matriz(annotator.players_position, position_plys_matriz)
 
             # cv2.destroyAllWindows()
         # Stream results
